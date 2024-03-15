@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Trascrizione Elaborata</title>
+<style>
+
+	html, body {
+	  height: 100%;
+	}
+
+
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+  }
+
+  .container {
+    width: 80%;
+    max-width: 800px;
+  }
+  
+	.container {
+	  display: flex;
+	  flex-direction: column;
+	  justify-content: space-around; /* Distribuisce lo spazio uniformemente */
+	  height: 90%; /* Utilizza una percentuale dell'altezza della pagina */
+	}
+  
+	.input-container, .output-container {
+	  display: flex;
+	  flex-direction: column;
+	  flex-grow: 1;
+	}
+
+	textarea {
+	  flex-grow: 1;
+	}
+
+  textarea {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    resize: vertical;
+  }
+
+  button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    padding: 14px 20px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  h1 {
+    text-align: center;
+  }
+
+  p {
+    text-align: center;
+    margin-top: -10px;
+    margin-bottom: 20px;
+  }
+
+  .label {
+    font-weight: bold;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Elaboratore di Trascrizioni Teams</h1>
+  <p>Inserisci la trascrizione di Microsoft Teams qui sotto per elaborarla e migliorarne la leggibilità.</p>
+  
+  <div class="input-container">
+    <label class="label" for="inputText">Inserisci la trascrizione:</label>
+    <textarea id="inputText"></textarea>
+  </div>
+  
+  <button onclick="processTranscription()">Elabora</button>
+  
+  <div class="output-container">
+    <label class="label" for="outputText">Risultato:</label>
+    <textarea id="outputText" readonly></textarea>
+  </div>
+</div>
+
+<script>
+function processTranscription() {
+  const inputText = document.getElementById('inputText').value;
+  const lines = inputText.split('\n');
+  let result = '';
+  let previousSpeaker = '';
+  let speakersSet = new Set();
+
+  lines.forEach((line, index) => {
+    if (line.includes('-->')) {
+      const nextLine = lines[index + 1];
+      if (nextLine) {
+        const speaker = nextLine.split('\n')[0];
+        speakersSet.add(speaker);
+      }
+    }
+  });
+
+  lines.forEach((line, index) => {
+    if (line.includes('-->')) {
+      const nextLine = lines[index + 1];
+      if (nextLine && speakersSet.has(nextLine.split('\n')[0])) {
+        if (previousSpeaker !== nextLine) {
+          result += `Speaker: ${nextLine}\n`;
+          previousSpeaker = nextLine;
+        }
+      }
+    } else if (!speakersSet.has(line)) {
+      result += `${line}\n`;
+    }
+  });
+
+  document.getElementById('outputText').value = result.trim();
+}
+</script>
+</body>
+</html>
